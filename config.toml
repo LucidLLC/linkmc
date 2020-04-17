@@ -1,0 +1,20 @@
+[ redis ]
+host="127.0.0.1:6379"
+index=3
+key_prefix="linkmc:"
+
+[ bots ]
+  [ bots.discord ]
+  token = ""
+  enabled=true
+
+  [ bots.telegram ]
+  token=""
+  enabled=true
+
+[ twitter ]
+api_key=""
+api_secret=""
+
+[ web ]
+callback_path="/verify"

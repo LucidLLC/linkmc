@@ -1,0 +1,8 @@
+vendor/
+*.exe
+*.o
+*.s
+*.dll
+.idea/
+*.xml
+*.json
