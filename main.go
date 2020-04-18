@@ -11,13 +11,14 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	c, err := config.Read(*configFlag)
 
 	if err != nil {
 		panic(err)
 	}
 
-	a := app.New(c)
+	a := app.NewApp(c)
 
 	a.Run()
 }

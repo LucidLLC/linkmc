@@ -1,3 +1,4 @@
+github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bwmarrin/discordgo v0.20.0 h1:EVujVeX9y7hGISnw3SrhOTNiPtrAfihWdJetkumLZng=
 github.com/bwmarrin/discordgo v0.20.0/go.mod h1:Qojx8+Uc/wPdc8UGkHiTzEu84fumFqOyUnQ9Cac6/sc=
