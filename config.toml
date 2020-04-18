@@ -5,15 +5,15 @@ key_prefix="linkmc:"
 
 [ bots ]
   [ bots.discord ]
-  token = ""
+  token = "REDACTED"
   enabled=true
 
   [ bots.telegram ]
-  token=""
+  token="REDACTED"
   enabled=true
 
 [ twitter ]
-api_key=""
+api_key="ethan is a fucking loser"
 api_secret=""
 
 [ web ]
