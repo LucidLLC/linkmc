@@ -17,4 +17,8 @@ api_key=""
 api_secret=""
 
 [ web ]
+host="localhost:8080"
 callback_path="/verify"
+
+[ discord ]
+channel="verify"

@@ -1,9 +1,11 @@
 package telegram
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/rbrick/linkmc/bot"
 	"github.com/rbrick/linkmc/config"
+	"log"
 )
 
 type Bot struct {
@@ -16,6 +18,7 @@ type Bot struct {
 }
 
 func (b *Bot) Init() error {
+	log.Println("creating new telegram bot api")
 	api, err := tgbotapi.NewBotAPI(b.conf.Token)
 
 	if err != nil {
@@ -27,6 +30,8 @@ func (b *Bot) Init() error {
 		if err != nil {
 			panic(err)
 		}
+
+		fmt.Println("now awaiting telegram updates")
 
 		for u := range updates {
 			if u.Message != nil {
