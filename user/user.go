@@ -16,14 +16,15 @@ type Link struct {
 	AddedAt  int64  `json:"addedAt"`
 }
 
-func (u *User) AddLink(link Link) {
+func (u *User) AddLink(link Link) bool {
 	for _, l := range u.Links {
 		if l.Service == link.Service {
-			return
+			return false
 		}
 	}
 
 	u.Links = append(u.Links, link)
+	return true
 }
 
 func (u *User) Save(db *bolt.DB) error {
@@ -51,7 +52,7 @@ func NewUser(uuid string) *User {
 	}
 }
 
-func GetOrCreateUser(uuid string, db *bolt.DB, cb func(*User)) error {
+func GetOrCreateUser(uuid string, db *bolt.DB, cb func(*User) error) error {
 	return db.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists([]byte("users"))
 
@@ -71,8 +72,7 @@ func GetOrCreateUser(uuid string, db *bolt.DB, cb func(*User)) error {
 			user = NewUser(uuid)
 		}
 
-		cb(user)
-		return nil
+		return cb(user)
 	})
 
 }
