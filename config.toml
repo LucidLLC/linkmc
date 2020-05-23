@@ -1,8 +1,3 @@
-[ redis ]
-host="127.0.0.1:6379"
-index=3
-key_prefix="linkmc:"
-
 [ bots ]
   [ bots.discord ]
   token = "REDACTED"
@@ -11,6 +6,9 @@ key_prefix="linkmc:"
   [ bots.telegram ]
   token="REDACTED"
   enabled=true
+
+[ database ]
+path = "linkmc.db"
 
 [ twitter ]
 api_key="ethan is a fucking loser"

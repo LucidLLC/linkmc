@@ -36,12 +36,17 @@ type Web struct {
 	CallbackPath string `toml:"callback_path"`
 }
 
+type Database struct {
+	Path string
+}
+
 type Config struct {
-	Bots    map[string]Bot
-	Discord Discord
-	Redis   Redis
-	Twitter Twitter
-	Web     Web
+	Bots     map[string]Bot
+	Discord  Discord
+	Redis    Redis
+	Twitter  Twitter
+	Web      Web
+	Database Database
 }
 
 func Read(file string) (*Config, error) {

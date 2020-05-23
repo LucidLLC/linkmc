@@ -4,10 +4,14 @@ import (
 	"flag"
 	"github.com/rbrick/linkmc/app"
 	"github.com/rbrick/linkmc/config"
+	bolt "go.etcd.io/bbolt"
+	"os"
 )
 
 var (
 	configFlag = flag.String("config", "config.toml", "Set the config path to use for the application")
+
+	application *app.Application
 )
 
 func main() {
@@ -18,7 +22,23 @@ func main() {
 		panic(err)
 	}
 
-	a := app.NewApp(c)
+	db, err := bolt.Open(c.Database.Path, os.ModePerm, &bolt.Options{})
 
-	a.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	application = app.NewApp(c)
+	application.DB = db
+
+	application.Run(func(app *app.Application) {
+
+		for _, b := range app.Bots {
+			if b.Config().Name == "telegram" {
+				b.Register("start", verify)
+			} else {
+				b.Register("verify", verify)
+			}
+		}
+	})
 }

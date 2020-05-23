@@ -7,14 +7,14 @@ import (
 
 type (
 	//CommandFunc represents a command func
-	CommandFunc func(string, []string)
+	CommandFunc func(Context, string, []string)
 
 	//CommandHandler
 	CommandHandler interface {
 		//Register registers a new command which is called when a command is received
 		Register(cmd string, handler CommandFunc)
 		//Receive is called when a command is received
-		Handle(cmdline string)
+		Handle(cmdline string, ctx Context)
 	}
 
 	Option func(bot Bot)
@@ -30,6 +30,7 @@ var registry = map[string]func(config.Bot, ...Option) Bot{
 }
 
 type BasicCommandHandler struct {
+	owner    Bot
 	commands map[string]CommandFunc
 }
 
@@ -37,13 +38,13 @@ func (h *BasicCommandHandler) Register(cmd string, handler CommandFunc) {
 	h.commands[cmd] = handler
 }
 
-func (h *BasicCommandHandler) Handle(cmdline string) {
+func (h *BasicCommandHandler) Handle(cmdline string, ctx Context) {
 	split := strings.Split(cmdline, " ")
 
 	// if the command is present
 	if val, ok := h.commands[split[0]]; ok {
 		// run the command!
-		val(split[0], split[1:])
+		val(ctx, split[0], split[1:])
 	}
 }
 

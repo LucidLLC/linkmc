@@ -8,17 +8,23 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+
+	bolt "go.etcd.io/bbolt"
 )
 
 type Application struct {
 	conf *config.Config
 	wg   sync.WaitGroup
 
-	bots []bot.Bot
+	DB *bolt.DB
+
+	Bots []bot.Bot
 }
 
-func (app *Application) Run() {
+func (app *Application) Run(init func(app *Application)) {
 	app.startBots()
+
+	init(app)
 
 	log.Println("application started. Press Ctrl+C to terminate")
 	sc := make(chan os.Signal, 1)
@@ -33,6 +39,8 @@ func (app *Application) startBots() {
 
 	for k, botConfig := range app.conf.Bots {
 		if botConfig.Enabled {
+			botConfig.Name = k
+
 			var opts []bot.Option
 
 			if k == "discord" {
@@ -49,21 +57,23 @@ func (app *Application) startBots() {
 				continue
 			}
 
-			app.bots = append(app.bots, bot)
+			app.Bots = append(app.Bots, bot)
 		}
 	}
 }
 
 func (app *Application) Shutdown() {
-	for _, b := range app.bots {
+	for _, b := range app.Bots {
 		err := b.Close()
 
 		if err != nil {
 			log.Println("error closing bot:", err)
 		}
 	}
+
+	_ = app.DB.Close()
 }
 
 func NewApp(conf *config.Config) *Application {
-	return &Application{conf: conf, bots: []bot.Bot{}}
+	return &Application{conf: conf, Bots: []bot.Bot{}}
 }

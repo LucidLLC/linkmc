@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rbrick/linkmc/config"
 	"log"
@@ -24,6 +23,29 @@ type DiscordBot struct {
 	VerifyChannel string
 }
 
+type DiscordContext struct {
+	owner *DiscordBot
+
+	user   string
+	chatID string
+}
+
+func (c *DiscordContext) User() string {
+	return c.user
+}
+
+func (c *DiscordContext) ChatID() string {
+	return c.chatID
+}
+
+func (c *DiscordContext) SendMessage(s string) {
+	_, _ = c.owner.session.ChannelMessageSend(c.chatID, s)
+}
+
+func (c *DiscordContext) Bot() Bot {
+	return c.owner
+}
+
 func (b *DiscordBot) Init() error {
 	log.Println("creating discord bot")
 	discord, err := discordgo.New("Bot " + b.conf.Token)
@@ -44,6 +66,7 @@ func (b *DiscordBot) Init() error {
 
 	log.Println("discord bot now running")
 	b.session = discord
+
 	return nil
 }
 
@@ -87,9 +110,12 @@ func (b *DiscordBot) messageCreate(s *discordgo.Session, m *discordgo.MessageCre
 		return
 	}
 
-	fmt.Println("message")
 	if m.Content[0] == '/' {
-		b.CommandHandler.Handle(m.Content[1:])
+		b.CommandHandler.Handle(m.Content[1:], &DiscordContext{
+			owner:  b,
+			user:   m.Author.Username,
+			chatID: m.ChannelID,
+		})
 	}
 }
 
