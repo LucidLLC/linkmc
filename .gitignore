@@ -6,3 +6,4 @@ vendor/
 .idea/
 *.xml
 *.json
+*.db
