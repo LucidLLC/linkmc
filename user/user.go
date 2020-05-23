@@ -6,14 +6,14 @@ import (
 )
 
 type User struct {
-	UserID string
-	Links  []Link
+	UserID string `json:"id"`
+	Links  []Link `json:"links"`
 }
 
 type Link struct {
-	Service  string
-	Username string
-	AddedAt  int64
+	Service  string `json:"service"`
+	Username string `json:"username"`
+	AddedAt  int64  `json:"addedAt"`
 }
 
 func (u *User) AddLink(link Link) {
@@ -44,6 +44,35 @@ func (u *User) Save(db *bolt.DB) error {
 	})
 }
 
-func GetOrCreateUser(uuid string, db *bolt.DB) *User {
+func NewUser(uuid string) *User {
+	return &User{
+		UserID: uuid,
+		Links:  []Link{},
+	}
+}
+
+func GetOrCreateUser(uuid string, db *bolt.DB, cb func(*User)) error {
+	return db.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists([]byte("users"))
+
+		if err != nil {
+			return err
+		}
+
+		userJson := bucket.Get([]byte(uuid))
+
+		var user *User
+
+		if userJson != nil {
+			if err = json.Unmarshal(userJson, user); err != nil {
+				return err
+			}
+		} else {
+			user = NewUser(uuid)
+		}
+
+		cb(user)
+		return nil
+	})
 
 }
