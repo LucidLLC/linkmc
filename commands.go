@@ -38,7 +38,7 @@ func verify(bot bot.Context, name string, args []string) {
 				return errors.New("service already linked")
 			}
 
-			return nil
+			return u.Save(application.DB)
 		})
 	})
 
