@@ -37,7 +37,8 @@ type Web struct {
 }
 
 type Database struct {
-	Path string
+	Path      string
+	AuthToken string `toml:"auth_token"`
 }
 
 type Config struct {

@@ -9,6 +9,8 @@
 
 [ database ]
 path = "linkmc.db"
+# this is used for verifying that requests are coming from our servers
+auth_token = "something super secret and secure that no one can guess"
 
 [ twitter ]
 api_key="ethan is a fucking loser"
