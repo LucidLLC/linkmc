@@ -1,10 +1,10 @@
 [ bots ]
   [ bots.discord ]
-  token = "NjA3MDAzODE2NzAwODA1MTIw.Xsttkw.bYMqzfy_ONZHoRFXjfoEPSDEa6Q"
+  token = "REDACTED"
   enabled=true
 
   [ bots.telegram ]
-  token="984860470:AAFWoRBFMweVMrO87cHOHUa7cHE9zwwbmZ0"
+  token="REDACTED"
   enabled=true
 
 [ database ]
