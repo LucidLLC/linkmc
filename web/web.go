@@ -141,12 +141,12 @@ func (h *Handler) startLink(ctx echo.Context) error {
 	return err
 }
 
-func (h *Handler) AuthTokenMiddleware(f echo.HandlerFunc) echo.HandlerFunc {
+func (h *Handler) AuthTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		if ctx.Request().Header.Get("X-Link-Auth-Token") == h.conf.AuthToken {
-			return f(ctx)
+			return next(ctx)
 		}
-		return ctx.JSON(http.StatusForbidden, "invalid authentication token")
+		return ctx.String(http.StatusForbidden, "invalid authentication token")
 	}
 }
 
