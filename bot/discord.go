@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rbrick/linkmc/config"
 	"log"
@@ -113,7 +114,7 @@ func (b *DiscordBot) messageCreate(s *discordgo.Session, m *discordgo.MessageCre
 	if m.Content[0] == '/' {
 		b.CommandHandler.Handle(m.Content[1:], &DiscordContext{
 			owner:  b,
-			user:   m.Author.Username,
+			user:   fmt.Sprintf("%s#%s", m.Author.Username, m.Author.Discriminator),
 			chatID: m.ChannelID,
 		})
 	}
