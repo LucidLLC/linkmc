@@ -33,12 +33,12 @@ type Twitter struct {
 
 type Web struct {
 	Host         string
+	AuthToken    string `toml:"auth_token"`
 	CallbackPath string `toml:"callback_path"`
 }
 
 type Database struct {
-	Path      string
-	AuthToken string `toml:"auth_token"`
+	Path string
 }
 
 type Config struct {

@@ -63,14 +63,12 @@ func (b *TelegramBot) Init() error {
 
 		for u := range updates {
 			if u.Message != nil {
-				text := u.Message.Text
-
 				if u.Message.From.ID == botapi.Self.ID {
 					continue // skip over ourselves
 				}
 
-				if text[0] == '/' {
-					b.CommandHandler.Handle(text[1:], &TelegramContext{
+				if u.Message.IsCommand() {
+					b.CommandHandler.Handle(u.Message.Command()+" "+u.Message.CommandArguments(), &TelegramContext{
 						owner:  b,
 						user:   u.Message.Chat.UserName,
 						chatID: strconv.FormatInt(u.Message.Chat.ID, 10),

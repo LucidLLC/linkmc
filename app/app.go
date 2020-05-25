@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/rbrick/linkmc/bot"
 	"github.com/rbrick/linkmc/config"
+	"github.com/rbrick/linkmc/web"
 	"log"
 	"os"
 	"os/signal"
@@ -13,10 +14,10 @@ import (
 )
 
 type Application struct {
-	conf *config.Config
-	wg   sync.WaitGroup
-
-	DB *bolt.DB
+	conf       *config.Config
+	wg         sync.WaitGroup
+	webHandler *web.Handler
+	DB         *bolt.DB
 
 	Bots []bot.Bot
 }
@@ -25,6 +26,10 @@ func (app *Application) Run(init func(app *Application)) {
 	app.startBots()
 
 	init(app)
+
+	app.webHandler = web.New(app.DB, app.conf.Web)
+
+	app.webHandler.Start(app.conf.Web.Host)
 
 	log.Println("application started. Press Ctrl+C to terminate")
 	sc := make(chan os.Signal, 1)
@@ -63,7 +68,9 @@ func (app *Application) startBots() {
 }
 
 func (app *Application) Shutdown() {
+	log.Println("shutting down bots...")
 	for _, b := range app.Bots {
+		log.Printf("shutting down bot %s", b.Config().Name)
 		err := b.Close()
 
 		if err != nil {
@@ -71,7 +78,12 @@ func (app *Application) Shutdown() {
 		}
 	}
 
+	log.Println("saving database...")
 	_ = app.DB.Close()
+
+	if err := app.webHandler.Shutdown(); err != nil {
+		log.Panicln(err)
+	}
 }
 
 func NewApp(conf *config.Config) *Application {

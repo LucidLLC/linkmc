@@ -1,16 +1,14 @@
 [ bots ]
   [ bots.discord ]
-  token = "REDACTED"
+  token = "NjA3MDAzODE2NzAwODA1MTIw.Xsttkw.bYMqzfy_ONZHoRFXjfoEPSDEa6Q"
   enabled=true
 
   [ bots.telegram ]
-  token="REDACTED"
+  token="984860470:AAFWoRBFMweVMrO87cHOHUa7cHE9zwwbmZ0"
   enabled=true
 
 [ database ]
 path = "linkmc.db"
-# this is used for verifying that requests are coming from our servers
-auth_token = "something super secret and secure that no one can guess"
 
 [ twitter ]
 api_key="ethan is a fucking loser"
@@ -19,6 +17,8 @@ api_secret=""
 [ web ]
 host="localhost:8080"
 callback_path="/verify"
+# this is used for verifying that requests are coming from our servers
+auth_token = "something super secret and secure that no one can guess"
 
 [ discord ]
 channel="verify"
