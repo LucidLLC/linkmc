@@ -3,7 +3,6 @@ package web
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rbrick/linkmc/config"
@@ -101,18 +100,15 @@ func (h *Handler) startLink(ctx echo.Context) error {
 	tx, err = h.db.Begin(true)
 
 	if err != nil {
-		fmt.Println("error saving user")
 		return err
 	}
 
 	if err = u.Save(tx); err != nil {
-		fmt.Println("error saving user")
 		return err
 	}
 
 	if err = tx.Commit(); err != nil {
 		_ = tx.Rollback()
-		fmt.Println("error saving user")
 		return err
 	}
 
