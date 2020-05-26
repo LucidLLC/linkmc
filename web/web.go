@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/rbrick/linkmc/config"
 	"github.com/rbrick/linkmc/user"
 	"github.com/rbrick/linkmc/util"
@@ -91,9 +92,8 @@ func (h *Handler) startLink(ctx echo.Context) error {
 		return err
 	}
 
-	if !u.AddPendingLink(pendingLink) {
-
-		return ctx.String(http.StatusBadRequest, user.ErrLinkAlreadyPending.Error())
+	if err = u.AddPendingLink(pendingLink); err != nil {
+		return ctx.String(http.StatusBadRequest, err.Error())
 	}
 
 	_ = tx.Rollback()
@@ -168,8 +168,12 @@ func New(db *bolt.DB, web config.Web) *Handler {
 		conf: web,
 	}
 
-	h.echo.GET("/links/:uuid", h.getLinks, h.AuthTokenMiddleware)
-	h.echo.GET("/startlink/:service/:uuid/:expire", h.startLink, h.AuthTokenMiddleware)
+	logConfig := middleware.DefaultLoggerConfig
+	logConfig.Format = "${time_rfc3339} - ${id} » ${method} ${host}${path} (${status})\n"
+
+	h.echo.Use(h.AuthTokenMiddleware, middleware.LoggerWithConfig(logConfig))
+	h.echo.GET("/links/:uuid", h.getLinks)
+	h.echo.GET("/startlink/:service/:uuid/:expire", h.startLink)
 
 	return h
 }

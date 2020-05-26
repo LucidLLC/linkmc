@@ -3,7 +3,6 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	bolt "go.etcd.io/bbolt"
 	"time"
 )
@@ -12,6 +11,7 @@ var (
 	ErrUserNotFound       = errors.New("user not found")
 	ErrLinkAlreadyPending = errors.New("link already pending")
 	ErrPendingLinkExpired = errors.New("link expired")
+	ErrAlreadyLinked      = errors.New("account already linked")
 )
 
 type User struct {
@@ -43,20 +43,25 @@ func (u *User) AddLink(link Link) bool {
 	return true
 }
 
-func (u *User) AddPendingLink(link PendingLink) bool {
+func (u *User) AddPendingLink(link PendingLink) error {
+
+	for _, l := range u.Links {
+		if l.Service == link.Service {
+			return ErrAlreadyLinked
+		}
+	}
+
 	for _, l := range u.PendingLinks {
 		if l.Service == link.Service {
 			if time.Now().Unix() <= link.Expire {
-				return false
+				return ErrLinkAlreadyPending
 			}
 		}
 	}
 
-	fmt.Println("adding link")
-
 	u.RemovePendingLink(link.Service)
 	u.PendingLinks = append(u.PendingLinks, link)
-	return true
+	return nil
 }
 
 func (u *User) RemovePendingLink(service string) {
