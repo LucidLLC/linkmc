@@ -16,6 +16,10 @@ type Discord struct {
 	Channel string
 }
 
+type Telegram struct {
+	Channel string
+}
+
 type Bot struct {
 	Name    string
 	Token   string
@@ -44,6 +48,7 @@ type Database struct {
 type Config struct {
 	Bots     map[string]Bot
 	Discord  Discord
+	Telegram Telegram
 	Redis    Redis
 	Twitter  Twitter
 	Web      Web

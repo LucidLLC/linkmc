@@ -4,21 +4,42 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+
+	//tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/rbrick/linkmc/bot"
 	"github.com/rbrick/linkmc/user"
 	bolt "go.etcd.io/bbolt"
 	"time"
 )
 
-func verify(bot bot.Context, name string, args []string) {
+func verify(context bot.Context, name string, args []string) {
 	if len(args) != 1 {
-		bot.SendMessage("Invalid number of arguments")
+		context.SendMessage("Invalid number of arguments")
 		return
 	}
 
 	if args[0] == "" {
-		bot.SendMessage("Invalid argument")
+		context.SendMessage("Invalid argument")
 		return
+	}
+
+	if context.Bot().Config().Name == "telegram" {
+		tgapi := context.Bot().API().(*tgbotapi.BotAPI)
+		channel := context.Bot().(*bot.TelegramBot).BroadcastChannel
+
+		member, err := tgapi.GetChatMember(tgbotapi.ChatConfigWithUser{
+			UserID:             context.UserID(),
+			SuperGroupUsername: channel,
+		})
+
+		if err != nil {
+			context.SendMessage(err.Error())
+			return
+		} else if !member.IsMember() {
+			context.SendMessage("You do not appear to be in our news channel! Please join @MCTeamsNews!")
+			return
+		}
 	}
 
 	err := application.DB.Update(func(tx *bolt.Tx) error {
@@ -40,8 +61,8 @@ func verify(bot bot.Context, name string, args []string) {
 			return err
 		}
 
-		if bot.Bot().Config().Name != pendingLink.Service {
-			return errors.New(fmt.Sprintf("mismatched service. Token for %s used on %s.", pendingLink.Service, bot.Bot().Config().Name))
+		if context.Bot().Config().Name != pendingLink.Service {
+			return errors.New(fmt.Sprintf("mismatched service. Token for %s used on %s.", pendingLink.Service, context.Bot().Config().Name))
 		}
 
 		if time.Now().Unix() >= pendingLink.Expire {
@@ -55,8 +76,8 @@ func verify(bot bot.Context, name string, args []string) {
 		}
 
 		added := u.AddLink(user.Link{
-			Service:  bot.Bot().Config().Name,
-			Username: bot.User(),
+			Service:  context.Bot().Config().Name,
+			Username: context.User(),
 			AddedAt:  time.Now().Unix(),
 		})
 
@@ -72,9 +93,9 @@ func verify(bot bot.Context, name string, args []string) {
 	})
 
 	if err != nil {
-		bot.SendMessage(err.Error())
+		context.SendMessage(err.Error())
 	} else {
-		bot.SendMessage("You have successfully linked your account!")
+		context.SendMessage("You have successfully linked your account!")
 	}
 
 }

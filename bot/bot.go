@@ -65,6 +65,9 @@ type Bot interface {
 	//Close is called to close the bot
 	Close() error
 
+	// The backing API
+	API() interface{}
+
 	// The config for the bot
 	Config() config.Bot
 }

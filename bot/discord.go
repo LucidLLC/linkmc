@@ -35,6 +35,10 @@ func (c *DiscordContext) User() string {
 	return c.user
 }
 
+func (c *DiscordContext) UserID() int {
+	return -1
+}
+
 func (c *DiscordContext) ChatID() string {
 	return c.chatID
 }
@@ -73,6 +77,10 @@ func (b *DiscordBot) Init() error {
 
 func (b *DiscordBot) Close() error {
 	return b.session.Close()
+}
+
+func (b *DiscordBot) API() interface{} {
+	return b.session
 }
 
 func (b *DiscordBot) Config() config.Bot {

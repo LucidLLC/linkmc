@@ -22,3 +22,6 @@ auth_token = "something super secret and secure that no one can guess"
 
 [ discord ]
 channel="verify"
+
+[ telegram ]
+channel="@mcteamsnews"

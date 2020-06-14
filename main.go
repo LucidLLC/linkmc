@@ -11,6 +11,8 @@ import (
 var (
 	configFlag = flag.String("config", "config.toml", "Set the config path to use for the application")
 
+	conf *config.Config
+
 	application *app.Application
 )
 
@@ -21,6 +23,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	conf = c
 
 	db, err := bolt.Open(c.Database.Path, os.ModePerm, &bolt.Options{})
 

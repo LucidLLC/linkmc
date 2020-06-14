@@ -50,6 +50,8 @@ func (app *Application) startBots() {
 
 			if k == "discord" {
 				opts = append(opts, bot.WithVerifyChannel(app.conf.Discord.Channel))
+			} else if k == "telegram" {
+				opts = append(opts, bot.WithBroadcastChannel(app.conf.Telegram.Channel))
 			}
 
 			log.Println("creating", k, "bot")
