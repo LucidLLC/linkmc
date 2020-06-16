@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"encoding/json"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rbrick/linkmc/config"
@@ -15,10 +16,20 @@ import (
 	"time"
 )
 
+var (
+	messageChannel chan struct{}
+)
+
+func QueueMessage(s struct{}) {
+	messageChannel <- s
+}
+
 type Handler struct {
 	db   *bolt.DB
 	conf config.Web
 	echo *echo.Echo
+
+	upgrader *websocket.Upgrader
 
 	server *http.Server
 }
@@ -35,6 +46,7 @@ func (h *Handler) Start(addr string) {
 
 func (h *Handler) Shutdown() error {
 	log.Println("shutting down http server...")
+	close(messageChannel)
 	return h.echo.Shutdown(context.Background())
 }
 
@@ -157,11 +169,34 @@ func (h *Handler) AuthTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func (h *Handler) WebsocketHandler(ctx echo.Context) error {
+	wsConn, err := h.upgrader.Upgrade(ctx.Response(), ctx.Request(), ctx.Request().Header)
+
+	if err != nil {
+		return err
+	}
+
+	for message := range messageChannel {
+		// Write
+		err := wsConn.WriteJSON(message)
+		if err != nil {
+			ctx.Logger().Error(err)
+		}
+
+		// Read
+		// Ignore anything, we're only worried about sending it to the client
+		_, _, _ = wsConn.ReadMessage()
+	}
+
+	return nil
+}
+
 func New(db *bolt.DB, web config.Web) *Handler {
 	h := &Handler{
-		db:   db,
-		echo: echo.New(),
-		conf: web,
+		db:       db,
+		echo:     echo.New(),
+		conf:     web,
+		upgrader: &websocket.Upgrader{WriteBufferSize: 1024, ReadBufferSize: 1024},
 	}
 
 	logConfig := middleware.DefaultLoggerConfig
@@ -170,6 +205,7 @@ func New(db *bolt.DB, web config.Web) *Handler {
 	h.echo.Use(h.AuthTokenMiddleware, middleware.LoggerWithConfig(logConfig))
 	h.echo.GET("/links/:uuid", h.getLinks)
 	h.echo.GET("/startlink/:service/:uuid/:expire", h.startLink)
+	h.echo.GET("/messages", h.WebsocketHandler)
 
 	return h
 }
