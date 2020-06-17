@@ -17,10 +17,10 @@ import (
 )
 
 var (
-	messageChannel chan struct{}
+	messageChannel = make(chan interface{})
 )
 
-func QueueMessage(s struct{}) {
+func QueueMessage(s interface{}) {
 	messageChannel <- s
 }
 
@@ -31,7 +31,13 @@ type Handler struct {
 
 	upgrader *websocket.Upgrader
 
+	clients map[*websocket.Conn]bool
+
 	server *http.Server
+}
+
+func (h *Handler) AddClient(conn *websocket.Conn) {
+	h.clients[conn] = true
 }
 
 func (h *Handler) Start(addr string) {
@@ -41,12 +47,37 @@ func (h *Handler) Start(addr string) {
 		}
 	}()
 
+	go func() {
+		for {
+			for k, _ := range h.clients {
+				err := k.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(10*time.Second))
+
+				if err != nil {
+					delete(h.clients, k)
+				} else {
+					_, _, _ = k.ReadMessage()
+				}
+			}
+		}
+	}()
+
+	go func() {
+		for msg := range messageChannel {
+			for k, _ := range h.clients {
+				err := k.WriteJSON(msg)
+
+				if err != nil {
+					delete(h.clients, k)
+				}
+			}
+		}
+	}()
+
 	log.Printf("started http server on %s\n", addr)
 }
 
 func (h *Handler) Shutdown() error {
 	log.Println("shutting down http server...")
-	close(messageChannel)
 	return h.echo.Shutdown(context.Background())
 }
 
@@ -170,24 +201,14 @@ func (h *Handler) AuthTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func (h *Handler) WebsocketHandler(ctx echo.Context) error {
-	wsConn, err := h.upgrader.Upgrade(ctx.Response(), ctx.Request(), ctx.Request().Header)
+	//go func() {
+	wsConn, err := h.upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 
 	if err != nil {
+		ctx.Logger().Error(err)
 		return err
 	}
-
-	for message := range messageChannel {
-		// Write
-		err := wsConn.WriteJSON(message)
-		if err != nil {
-			ctx.Logger().Error(err)
-		}
-
-		// Read
-		// Ignore anything, we're only worried about sending it to the client
-		_, _, _ = wsConn.ReadMessage()
-	}
-
+	h.AddClient(wsConn)
 	return nil
 }
 
@@ -196,7 +217,8 @@ func New(db *bolt.DB, web config.Web) *Handler {
 		db:       db,
 		echo:     echo.New(),
 		conf:     web,
-		upgrader: &websocket.Upgrader{WriteBufferSize: 1024, ReadBufferSize: 1024},
+		upgrader: &websocket.Upgrader{},
+		clients:  make(map[*websocket.Conn]bool),
 	}
 
 	logConfig := middleware.DefaultLoggerConfig

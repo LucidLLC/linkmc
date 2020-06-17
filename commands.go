@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/rbrick/linkmc/web"
 
 	//tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/rbrick/linkmc/bot"
@@ -42,6 +43,8 @@ func verify(context bot.Context, name string, args []string) {
 		}
 	}
 
+	var fUser *user.User
+	var fLink user.Link
 	err := application.DB.Update(func(tx *bolt.Tx) error {
 		keys, err := tx.CreateBucketIfNotExists([]byte("keys"))
 
@@ -75,11 +78,12 @@ func verify(context bot.Context, name string, args []string) {
 			return err
 		}
 
-		added := u.AddLink(user.Link{
+		fLink = user.Link{
 			Service:  context.Bot().Config().Name,
 			Username: context.User(),
 			AddedAt:  time.Now().Unix(),
-		})
+		}
+		added := u.AddLink(fLink)
 
 		if !added {
 			return errors.New("service already linked")
@@ -89,12 +93,21 @@ func verify(context bot.Context, name string, args []string) {
 
 		_ = keys.Delete([]byte(args[0]))
 
+		fUser = u
 		return u.Save(tx)
 	})
 
 	if err != nil {
 		context.SendMessage(err.Error())
 	} else {
+		web.QueueMessage(struct {
+			U    *user.User `json:"user"`
+			Link user.Link  `json:"link"`
+		}{
+			U:    fUser,
+			Link: fLink,
+		})
+		fmt.Println("hello world")
 		context.SendMessage("You have successfully linked your account!")
 	}
 
