@@ -1,8 +1,8 @@
 package bot
 
 import (
+	"github.com/LucidLLC/linkmc/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/rbrick/linkmc/config"
 	"log"
 	"strconv"
 )

@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"github.com/rbrick/linkmc/config"
+	"github.com/LucidLLC/linkmc/config"
 	"strings"
 )
 

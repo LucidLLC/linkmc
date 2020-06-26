@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/rbrick/linkmc/bot"
-	"github.com/rbrick/linkmc/config"
-	"github.com/rbrick/linkmc/web"
+	"github.com/LucidLLC/linkmc/bot"
+	"github.com/LucidLLC/linkmc/config"
+	"github.com/LucidLLC/linkmc/web"
 	"log"
 	"os"
 	"os/signal"

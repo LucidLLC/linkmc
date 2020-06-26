@@ -1,4 +1,4 @@
-module github.com/rbrick/linkmc
+module github.com/LucidLLC/linkmc
 
 go 1.14
 

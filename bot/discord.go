@@ -2,8 +2,8 @@ package bot
 
 import (
 	"fmt"
+	"github.com/LucidLLC/linkmc/config"
 	"github.com/bwmarrin/discordgo"
-	"github.com/rbrick/linkmc/config"
 	"log"
 )
 

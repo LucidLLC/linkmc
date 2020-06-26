@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/LucidLLC/linkmc/bot"
+	"github.com/LucidLLC/linkmc/user"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/rbrick/linkmc/web"
 
 	//tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/rbrick/linkmc/bot"
-	"github.com/rbrick/linkmc/user"
+
 	bolt "go.etcd.io/bbolt"
 	"time"
 )

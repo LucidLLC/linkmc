@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/rbrick/linkmc/app"
-	"github.com/rbrick/linkmc/config"
+	"github.com/LucidLLC/linkmc/app"
+	"github.com/LucidLLC/linkmc/config"
+
 	bolt "go.etcd.io/bbolt"
 	"os"
 )
