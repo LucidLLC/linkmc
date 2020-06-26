@@ -108,7 +108,6 @@ func verify(context bot.Context, name string, args []string) {
 			U:    fUser,
 			Link: fLink,
 		})
-		fmt.Println("hello world")
 		context.SendMessage("You have successfully linked your account!")
 	}
 
