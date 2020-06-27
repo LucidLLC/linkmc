@@ -54,8 +54,13 @@ func (h *Handler) Start(addr string) {
 
 				if err != nil {
 					delete(h.clients, k)
+					_ = k.Close()
 				} else {
-					_, _, _ = k.ReadMessage()
+					_, _, err = k.ReadMessage()
+
+					if err != nil {
+						_ = k.Close()
+					}
 				}
 			}
 		}
@@ -68,6 +73,7 @@ func (h *Handler) Start(addr string) {
 
 				if err != nil {
 					delete(h.clients, k)
+					_ = k.Close()
 				}
 			}
 		}
