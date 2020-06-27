@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/LucidLLC/linkmc/config"
 	"github.com/LucidLLC/linkmc/user"
 	"github.com/LucidLLC/linkmc/util"
@@ -50,19 +51,23 @@ func (h *Handler) Start(addr string) {
 	go func() {
 		for {
 			for k, _ := range h.clients {
-				err := k.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(10*time.Second))
-
+				err := k.WriteMessage(websocket.TextMessage, []byte("PING"))
 				if err != nil {
 					delete(h.clients, k)
 					_ = k.Close()
 				} else {
-					_, _, err = k.ReadMessage()
+					msgType, pong, err := k.ReadMessage()
 
 					if err != nil {
 						_ = k.Close()
+					} else {
+						if msgType == websocket.TextMessage && string(pong) == "PONG" {
+						}
 					}
 				}
 			}
+
+			time.Sleep(5 * time.Second)
 		}
 	}()
 
@@ -72,6 +77,7 @@ func (h *Handler) Start(addr string) {
 				err := k.WriteJSON(msg)
 
 				if err != nil {
+					fmt.Println("failed to write message:", err)
 					delete(h.clients, k)
 					_ = k.Close()
 				}
