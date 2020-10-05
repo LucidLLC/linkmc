@@ -8,14 +8,14 @@
   enabled=false
 
 [ database ]
-path = "db/linkmc.db"
+path = "./db/linkmc.db"
 
 [ twitter ]
 api_key="ethan is a fucking loser"
 api_secret=""
 
 [ web ]
-host="localhost:8080"
+host=":8080"
 callback_path="/verify"
 # this is used for verifying that requests are coming from our servers
 auth_token = "something super secret and secure that no one can guess"
