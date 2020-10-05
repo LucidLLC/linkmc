@@ -1,11 +1,11 @@
 [ bots ]
   [ bots.discord ]
   token = "REDACTED"
-  enabled=true
+  enabled=false
 
   [ bots.telegram ]
   token="REDACTED"
-  enabled=true
+  enabled=false
 
 [ database ]
 path = "db/linkmc.db"

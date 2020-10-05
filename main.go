@@ -2,15 +2,17 @@ package main
 
 import (
 	"flag"
+
 	"github.com/LucidLLC/linkmc/app"
 	"github.com/LucidLLC/linkmc/config"
 
-	bolt "go.etcd.io/bbolt"
 	"os"
+
+	bolt "go.etcd.io/bbolt"
 )
 
 var (
-	configFlag = flag.String("config", "config.toml", "Set the config path to use for the application")
+	configFlag = flag.String("config", "conf/config.toml", "Set the config path to use for the application")
 
 	conf *config.Config
 
