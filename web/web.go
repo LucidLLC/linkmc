@@ -4,6 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/LucidLLC/linkmc/config"
 	"github.com/LucidLLC/linkmc/user"
 	"github.com/LucidLLC/linkmc/util"
@@ -11,10 +16,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	bolt "go.etcd.io/bbolt"
-	"log"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 var (
@@ -44,7 +45,9 @@ func (h *Handler) AddClient(conn *websocket.Conn) {
 func (h *Handler) Start(addr string) {
 	go func() {
 		if err := h.echo.Start(addr); err != nil {
-			log.Panicln(err)
+			if err != http.ErrServerClosed {
+				log.Panicln(err)
+			}
 		}
 	}()
 
