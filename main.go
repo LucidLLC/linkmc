@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	configFlag = flag.String("config", "conf/config.toml", "Set the config path to use for the application")
+	configFlag = flag.String("config", "/data/conf/config.toml", "Set the config path to use for the application")
 
 	conf *config.Config
 
