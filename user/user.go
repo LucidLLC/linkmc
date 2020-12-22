@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	bolt "go.etcd.io/bbolt"
 	"time"
 )
@@ -53,7 +54,12 @@ func (u *User) AddPendingLink(link PendingLink) error {
 
 	for _, l := range u.PendingLinks {
 		if l.Service == link.Service {
-			if time.Now().Unix() <= link.Expire {
+			now := time.Now().UnixNano() / 1000
+			if u.UserID == "2e0fe8c0-5b79-42b8-97a6-8db61a374983" {
+				fmt.Println("current time:", now, " expire time:", link.Expire)
+			}
+
+			if now <= link.Expire {
 				return ErrLinkAlreadyPending
 			}
 		}
